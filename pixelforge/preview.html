@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PixelForge preview sandbox</title>
+  <style>
+    html, body { margin: 0; background: #fff; overflow: hidden; }
+    #frame { position: absolute; top: 0; left: 0; display: block; border: 0; background: #fff; transform-origin: 0 0; }
+  </style>
+</head>
+<body>
+  <iframe id="frame" title="Generated page" sandbox="allow-scripts" referrerpolicy="no-referrer"></iframe>
+  <script>
+    (function () {
+      var frame = document.getElementById('frame');
+      var width = 1440;
+      var height = 800;
+
+      function fit() {
+        var available = Math.max(1, document.documentElement.clientWidth);
+        var scale = Math.min(1, available / width);
+        var offset = Math.max(0, (available - width * scale) / 2);
+        frame.style.width = width + 'px';
+        frame.style.height = height + 'px';
+        frame.style.transform = 'translateX(' + offset + 'px) scale(' + scale + ')';
+        var rendered = Math.max(1, Math.round(height * scale));
+        document.body.style.height = rendered + 'px';
+        parent.postMessage({ type: 'pf-preview-height', height: rendered }, '*');
+      }
+
+      function reportReady() {
+        parent.postMessage({ type: 'pf-preview-ready' }, '*');
+        fit();
+      }
+
+      window.addEventListener('message', function (event) {
+        if (event.source !== parent) return;
+        var data = event.data;
+        if (!data || typeof data !== 'object') return;
+        if (data.type === 'pf-ping') {
+          reportReady();
+          return;
+        }
+        if (data.type === 'pf-preview' && typeof data.html === 'string') {
+          width = Number(data.width) > 0 ? Number(data.width) : 1440;
+          height = Number(data.height) > 0 ? Number(data.height) : 800;
+          frame.style.width = width + 'px';
+          frame.style.height = height + 'px';
+          frame.srcdoc = data.html;
+          requestAnimationFrame(fit);
+        }
+      });
+
+      window.addEventListener('resize', fit);
+      frame.addEventListener('load', fit);
+      fit();
+      reportReady();
+    })();
+  </script>
+</body>
+</html>

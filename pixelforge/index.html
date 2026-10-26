@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="Turn a UI screenshot into editable, responsive HTML, CSS and JavaScript. Runs entirely in your browser.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 38 38'%3E%3Crect width='38' height='38' rx='9' fill='%237c9cff'/%3E%3Cg fill='%230b0e14'%3E%3Crect x='9' y='9' width='8' height='8' rx='1.5'/%3E%3Crect x='21' y='9' width='8' height='8' rx='1.5' opacity='.55'/%3E%3Crect x='9' y='21' width='8' height='8' rx='1.5' opacity='.55'/%3E%3Crect x='21' y='21' width='8' height='8' rx='1.5'/%3E%3C/g%3E%3C/svg%3E">
+  <title>PixelForge &middot; Screenshot to code</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="hero">
+    <div class="brand">
+      <svg class="logo" width="46" height="46" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs>
+          <linearGradient id="pf" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#7c9cff"></stop>
+            <stop offset="1" stop-color="#b57cff"></stop>
+          </linearGradient>
+        </defs>
+        <rect width="38" height="38" rx="9" fill="url(#pf)"></rect>
+        <g fill="#0b0e14">
+          <rect x="9" y="9" width="8" height="8" rx="1.5"></rect>
+          <rect x="21" y="9" width="8" height="8" rx="1.5" opacity=".55"></rect>
+          <rect x="9" y="21" width="8" height="8" rx="1.5" opacity=".55"></rect>
+          <rect x="21" y="21" width="8" height="8" rx="1.5"></rect>
+        </g>
+      </svg>
+      <div>
+        <h1>PixelForge</h1>
+        <p class="tagline">Turn a UI screenshot into clean, responsive HTML, CSS and JavaScript. Preview it live, edit the code, and download a ready-to-run project.</p>
+      </div>
+    </div>
+    <div class="chips" aria-label="Highlights">
+      <span class="chip">v<span id="app-version">1.0.0</span></span>
+      <span class="chip">Sandboxed preview</span>
+      <span class="chip">Runs in your browser</span>
+      <span class="chip">Open source &middot; MIT</span>
+    </div>
+  </header>
+
+  <main id="main" class="layout">
+    <div class="column">
+      <section class="card" aria-labelledby="shot-title">
+        <h2 id="shot-title"><span class="step">1</span> Screenshot</h2>
+
+        <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="Upload a screenshot. PNG, JPG or WebP up to 10 MB.">
+          <input id="file-input" type="file" accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp" hidden>
+          <div class="dropzone-inner">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 16V4"></path><path d="m7 9 5-5 5 5"></path>
+              <path d="M20 16.5V19a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2.5"></path>
+            </svg>
+            <strong>Drop a screenshot here</strong>
+            <span>or <span class="link">browse files</span></span>
+            <small>PNG, JPG or WebP &middot; up to 10 MB &middot; larger images are downscaled</small>
+          </div>
+        </div>
+
+        <div id="image-info" class="image-info" hidden>
+          <img id="image-thumb" alt="Uploaded screenshot preview">
+          <div class="image-meta">
+            <strong id="image-name"></strong>
+            <span id="image-dims"></span>
+            <span id="image-size"></span>
+            <span id="image-resized" class="muted"></span>
+          </div>
+          <button id="remove-image" class="btn ghost small" type="button">Remove</button>
+        </div>
+
+        <button id="demo-button" class="btn secondary full" type="button">Try the offline demo (no API call)</button>
+        <p class="hint">The demo loads a sample screenshot and pre-written code. It is <strong>not</strong> AI-generated.</p>
+      </section>
+
+      <section class="card" aria-labelledby="settings-title">
+        <h2 id="settings-title"><span class="step">2</span> Generation settings</h2>
+
+        <div class="field">
+          <label for="framework">Target framework</label>
+          <select id="framework">
+            <option value="html">HTML / CSS / JavaScript</option>
+          </select>
+          <p class="hint">React output is on the roadmap and not yet available.</p>
+        </div>
+
+        <div class="field">
+          <label for="viewport">Screenshot viewport</label>
+          <select id="viewport">
+            <option value="desktop">Desktop (1440px)</option>
+            <option value="tablet">Tablet (768px)</option>
+            <option value="mobile">Mobile (390px)</option>
+          </select>
+          <p class="hint">The viewport the screenshot was captured at.</p>
+        </div>
+
+        <div class="field">
+          <label for="fidelity">Fidelity</label>
+          <select id="fidelity">
+            <option value="Fast">Fast</option>
+            <option value="Balanced" selected>Balanced</option>
+            <option value="High">High detail</option>
+          </select>
+          <p class="hint">Higher detail costs more tokens and time.</p>
+        </div>
+
+        <div class="field">
+          <label for="instructions">Extra instructions <span class="muted">(optional)</span></label>
+          <textarea id="instructions" rows="3" maxlength="1000" placeholder="e.g. Use Tailwind-like utility styling without Tailwind. Make it mobile responsive."></textarea>
+          <div class="field-foot">
+            <span class="hint">Styling and structure preferences only.</span>
+            <span id="instructions-count" class="hint">0/1000</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="api-title">
+        <h2 id="api-title"><span class="step">3</span> Model &amp; API</h2>
+
+        <div id="api-status" class="notice info" role="status"></div>
+
+        <div class="field">
+          <label for="api-key">API key</label>
+          <div class="input-row">
+            <input id="api-key" type="password" autocomplete="off" spellcheck="false" placeholder="sk-...">
+            <button id="toggle-key" class="btn ghost" type="button" aria-label="Show API key" aria-pressed="false">Show</button>
+          </div>
+          <label class="check">
+            <input id="remember-key" type="checkbox">
+            Remember this key on this device
+          </label>
+          <p class="hint">The key stays in this browser and is sent directly to the API host. There is no PixelForge server. Leave it unchecked to keep it only for this tab.</p>
+        </div>
+
+        <div class="field">
+          <label for="model">Model</label>
+          <input id="model" type="text" value="gpt-4o" spellcheck="false" autocomplete="off">
+          <p class="hint">Any vision-capable OpenAI-compatible chat model.</p>
+        </div>
+
+        <div class="field">
+          <label for="base-url">API base URL <span class="muted">(optional)</span></label>
+          <input id="base-url" type="url" placeholder="https://api.openai.com/v1" spellcheck="false" autocomplete="off">
+          <p class="hint">Leave blank for OpenAI. Custom hosts must allow browser CORS requests; the extension asks for host permission the first time you use one.</p>
+        </div>
+
+        <div class="actions">
+          <button id="generate-button" class="btn primary full" type="button" disabled>Generate code</button>
+          <button id="clear-button" class="btn ghost full" type="button">Clear workspace</button>
+        </div>
+      </section>
+    </div>
+
+    <div class="column">
+      <section class="card result-card" aria-labelledby="result-title">
+        <div class="result-head">
+          <h2 id="result-title"><span class="step">4</span> Result</h2>
+          <button id="download-zip" class="btn primary" type="button" hidden>Download project (.zip)</button>
+        </div>
+
+        <div id="status" class="status" role="status" aria-live="polite" hidden></div>
+
+        <div id="empty-state" class="empty">
+          <strong>Nothing generated yet.</strong>
+          <p>Upload a screenshot and press <em>Generate code</em>, or load the offline demo to explore the editor, preview and export.</p>
+        </div>
+
+        <div id="result" hidden>
+          <div id="source-note" class="notice"></div>
+
+          <div class="tabs" role="tablist" aria-label="Result">
+            <button class="tab active" data-tab="preview" role="tab" aria-selected="true" aria-controls="panel-preview" id="tab-preview" type="button">Preview</button>
+            <button class="tab" data-tab="html" role="tab" aria-selected="false" aria-controls="panel-html" id="tab-html" type="button">HTML</button>
+            <button class="tab" data-tab="css" role="tab" aria-selected="false" aria-controls="panel-css" id="tab-css" type="button">CSS</button>
+            <button class="tab" data-tab="js" role="tab" aria-selected="false" aria-controls="panel-js" id="tab-js" type="button">JavaScript</button>
+            <button class="tab" data-tab="files" role="tab" aria-selected="false" aria-controls="panel-files" id="tab-files" type="button">Files</button>
+          </div>
+
+          <section id="panel-preview" class="panel" role="tabpanel" aria-labelledby="tab-preview">
+            <div id="preview-stage" class="preview-stage">
+              <div id="preview-holder" class="preview-holder">
+                <iframe id="preview-frame" title="Generated page preview" src="preview.html" sandbox="allow-scripts" referrerpolicy="no-referrer"></iframe>
+              </div>
+            </div>
+            <p class="hint" id="preview-caption"></p>
+          </section>
+
+          <section id="panel-html" class="panel" role="tabpanel" aria-labelledby="tab-html" hidden>
+            <div class="editor-toolbar">
+              <select id="select-html" class="file-select" aria-label="HTML file"></select>
+              <button class="btn ghost small copy-file" data-kind="html" type="button">Copy</button>
+            </div>
+            <div id="editor-html" class="editor"></div>
+          </section>
+
+          <section id="panel-css" class="panel" role="tabpanel" aria-labelledby="tab-css" hidden>
+            <div class="editor-toolbar">
+              <select id="select-css" class="file-select" aria-label="CSS file"></select>
+              <button class="btn ghost small copy-file" data-kind="css" type="button">Copy</button>
+            </div>
+            <div id="editor-css" class="editor"></div>
+          </section>
+
+          <section id="panel-js" class="panel" role="tabpanel" aria-labelledby="tab-js" hidden>
+            <div class="editor-toolbar">
+              <select id="select-js" class="file-select" aria-label="JavaScript file"></select>
+              <button class="btn ghost small copy-file" data-kind="js" type="button">Copy</button>
+            </div>
+            <div id="editor-js" class="editor"></div>
+          </section>
+
+          <section id="panel-files" class="panel" role="tabpanel" aria-labelledby="tab-files" hidden>
+            <div id="file-list" class="file-list"></div>
+            <div id="notes-block" class="notes" hidden>
+              <h3>Generator notes</h3>
+              <p id="notes"></p>
+            </div>
+            <details id="warnings-block" class="warnings" hidden>
+              <summary id="warnings-summary">Sanitiser warnings</summary>
+              <ul id="warnings"></ul>
+            </details>
+            <p class="hint">The ZIP also contains a README.md with exact run instructions. Edits made in the code tabs are included.</p>
+          </section>
+        </div>
+      </section>
+
+      <details class="card how">
+        <summary>How it works &amp; tips</summary>
+        <div class="steps">
+          <div class="mini-card"><b>1 &middot; Upload</b><span>A screenshot is validated and downscaled locally in your browser.</span></div>
+          <div class="mini-card"><b>2 &middot; Generate</b><span>A vision model returns structured JSON with HTML, CSS and JS files.</span></div>
+          <div class="mini-card"><b>3 &middot; Sanitise</b><span>Paths, sizes and remote references are checked before anything is shown.</span></div>
+          <div class="mini-card"><b>4 &middot; Preview &amp; edit</b><span>The page runs in a locked-down sandbox. Edits update the preview.</span></div>
+          <div class="mini-card"><b>5 &middot; Export</b><span>Download a ZIP with all files and a README.</span></div>
+        </div>
+        <ul class="tips">
+          <li>Crop screenshots to the area you want rebuilt; smaller images are faster and cheaper.</li>
+          <li>Choose the viewport the screenshot was captured at so the layout is matched first.</li>
+          <li>Photos become neutral placeholders: the output never loads external assets.</li>
+          <li>Use <em>Extra instructions</em> for style preferences, e.g. &ldquo;use CSS custom properties for the palette&rdquo;.</li>
+        </ul>
+      </details>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>PixelForge is open source under the MIT licence. Generated code is yours to use, but review it before deploying.</p>
+    <p class="muted">No screenshots or code are sent anywhere except to the API host you configure.</p>
+  </footer>
+
+  <div id="live" class="sr-only" aria-live="polite"></div>
+</body>
+</html>

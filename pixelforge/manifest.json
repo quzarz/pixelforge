@@ -1,0 +1,55 @@
+{
+  "manifest_version": 3,
+  "name": "PixelForge — screenshot to code",
+  "short_name": "PixelForge",
+  "version": "1.0.0",
+  "description": "Turn a UI screenshot into editable, responsive HTML, CSS and JavaScript in a sandboxed browser workspace.",
+  "minimum_chrome_version": "116",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_title": "Open PixelForge",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js",
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "permissions": [
+    "storage",
+    "clipboardWrite"
+  ],
+  "host_permissions": [
+    "https://api.openai.com/*"
+  ],
+  "optional_host_permissions": [
+    "https://*/*",
+    "http://*/*"
+  ],
+  "sandbox": {
+    "pages": [
+      "preview.html"
+    ]
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none';",
+    "sandbox": "sandbox allow-scripts; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; object-src 'none';"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "pixelforge@local",
+      "strict_min_version": "128.0"
+    }
+  }
+}

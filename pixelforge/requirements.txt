@@ -1,0 +1,6 @@
+# Runtime dependencies (constrained to major versions known to work together).
+streamlit>=1.50,<2
+pillow>=10.3,<13
+pydantic>=2.7,<3
+openai>=1.50,<4
+python-dotenv>=1.0,<2
